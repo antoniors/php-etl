@@ -116,6 +116,22 @@ class Etl
         }
     }
 
+     /**
+     * Load.
+     *
+     * @param  string  $loader
+     * @param  string  $output
+     * @param  array  $options
+     * @return $this
+     */
+    public function tap($tap)
+    {
+        $step = $this->container->make(\Marquine\Etl\Tap::class);
+        $step->callback = $tap;
+        $this->pipeline->pipe($step);
+        return $this;
+    }
+    
     /**
      * Get an array of the resulting ETL data.
      *
