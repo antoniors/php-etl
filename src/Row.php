@@ -21,6 +21,20 @@ class Row implements ArrayAccess
     protected $discarded = false;
 
     /**
+     * Determine if the row will be updated.
+     *
+     * @var bool
+     */
+    protected $updated = false;
+
+    /**
+     * Determine if the row will be inserted.
+     *
+     * @var bool
+     */
+    protected $inserted = false;
+
+    /**
      * Create a new Row instance.
      *
      * @param  array  $attributes
@@ -90,6 +104,46 @@ class Row implements ArrayAccess
     public function toArray()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Updated the row.
+     *
+     * @return void
+     */
+    public function update()
+    {
+        $this->updated = true;
+    }
+
+    /**
+     * Check if the row was updated.
+     *
+     * @return bool
+     */
+    public function updated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Insert the row.
+     *
+     * @return void
+     */
+    public function insert()
+    {
+        $this->inserted = true;
+    }
+
+    /**
+     * Check if the row was inserted.
+     *
+     * @return bool
+     */
+    public function inserted()
+    {
+        return $this->inserted;
     }
 
     /**
@@ -179,8 +233,8 @@ class Row implements ArrayAccess
     {
         unset($this->attributes[$offset]);
     }
-    
-     /**
+
+    /**
      * Unset the value for a given offset.
      *
      * @param  mixed  $offset
@@ -189,5 +243,5 @@ class Row implements ArrayAccess
     public function refresh($attributes)
     {
         $this->attributes = $attributes;
-    }    
+    }
 }
