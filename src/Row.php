@@ -179,4 +179,15 @@ class Row implements ArrayAccess
     {
         unset($this->attributes[$offset]);
     }
+    
+     /**
+     * Unset the value for a given offset.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function refresh($attributes)
+    {
+        $this->attributes = $attributes;
+    }    
 }
