@@ -118,14 +118,14 @@ class Insert extends Loader
      */
     public function load(Row $row)
     {
-        $row = $row->toArray();
-
         if ($this->transaction) {
+            $row->insert(true);
             $this->transactionManager->run(function () use ($row) {
-                $this->insert($row);
+                $this->insert($row->toArray());
             });
         } else {
-            $this->insert($row);
+            $row->insert(true);
+            $this->insert($row->toArray());
         }
     }
 
