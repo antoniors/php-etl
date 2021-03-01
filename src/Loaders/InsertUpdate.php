@@ -97,7 +97,7 @@ class InsertUpdate extends Loader
      * @var array
      */
     protected $availableOptions = [
-        'columns', 'connection', 'key', 'timestamps', 'transaction', 'commitSize'
+        'columns', 'connection', 'key', 'timestamps', 'transaction', 'commitSize',
     ];
 
     /**
@@ -139,8 +139,6 @@ class InsertUpdate extends Loader
      */
     public function load(Row $row)
     {
-        $row = $row->toArray();
-
         if ($this->transaction) {
             $this->transactionManager->run(function () use ($row) {
                 $this->execute($row);
@@ -220,42 +218,44 @@ class InsertUpdate extends Loader
     /**
      * Execute the given row.
      *
-     * @param  array  $row
+     * @param  Row  $row
      * @return void
      */
-    protected function execute($row)
+    protected function execute(Row $row)
     {
         if (! $this->select) {
             $this->prepareSelect();
         }
-
-	if ($this->columns) {
+        $current = $row->toArray();
+	    if ($this->columns) {
             $mapped_columns_arr = array();
             $key_columns = array_intersect($this->columns, $this->key);
 
             foreach ($key_columns as $key => $column) {
-                $mapped_columns_arr[$column] = array_intersect_key($row, $key_columns)[$key];
+                $mapped_columns_arr[$column] = array_intersect_key($current, $key_columns)[$key];
             };
             $this->select->execute($mapped_columns_arr);
-        } else {        
-	    $this->select->execute(array_intersect_key($row, array_flip($this->key)));
+        } else {
+	        $this->select->execute(array_intersect_key($current, array_flip($this->key)));
         }
 
         if ($this->columns) {
             $result = [];
 
             foreach ($this->columns as $key => $column) {
-                isset($row[$key]) ? $result[$column] = $row[$key] : $result[$column] = null;
+                isset($current[$key]) ? $result[$column] = $current[$key] : $result[$column] = null;
             }
-
-            $row = $result;
+            $current = $result;
         }
 
-        if ($current = $this->select->fetch()) {
-            $this->update($row, $current);
-        } else {
-            $this->insert($row);
+        if ($exist = $this->select->fetch()) {
+            $row->update(true);
+            $this->update($current, $exist);
+            return;
         }
+        $row->insert(true);
+        $this->insert($current);
+        return;
     }
 
     /**
