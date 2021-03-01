@@ -164,6 +164,9 @@ class Pipeline implements Iterator
             if ($step instanceof Loader) {
                 $step->load($this->current);
             }
+            if ($step instanceof Tap) {
+                $step->tap($this->current);
+            }
         }
 
         return true;
